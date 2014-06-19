@@ -168,6 +168,60 @@ function databasics_user_page(stdClass $account) {
 }
 
 
+/**
+ * Implements hook_token_info().
+ */
+function databasics_token_info() {
+  $info = array();
+
+  $info['types'] = array(
+    'databasics-totals' => array(
+      'name' => t('Databasics totals'),
+      'description' => t('Global databasics tokens.'),
+    ),
+    // [databasics-page:]
+    'databasics-page' => array(
+      'name' => t('Databasics'),
+      'description' => t('Tokens for databasics page counts.'),
+      'needs-data' => array('databasics_record'),
+    ),
+  );
+
+  $info['tokens'] = array(
+    'databasics-totals' => array(
+      // [databasics-totals:count]
+      'count' => array(
+        'name' => t('Total page views'),
+        'description' => t('Total page views for entire site.'),
+      ),
+    ),
+    // Page specific tokens.
+    'databasics-page' => array(
+      // Add a token for the view count.
+      // [databasics-page:view-count]
+      'view-count' => array(
+        'name' => t('View count'),
+        'description' => t('Number of times the page has been viewed by the current user.'),
+      ),
+      // [databasics-page:last-viewed]
+      'last-viewed' => array(
+        'name' => t('Last viewed'),
+        'description' => t('Date the page was last viewed.'),
+      ),
+  );
+
+  // [node:view-count], [node:view-count:last-viewed]
+  $info['tokens']['node'] = array(
+    'view-count' => array(
+      'name' => t('View count'),
+      'description' => t('Number of times the current node has been viewed by the current user.'),
+      'type' => 'databasics-page', 
+    ),
+  );
+
+  return $info;
+}
+
 
 
 
