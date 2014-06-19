@@ -222,8 +222,54 @@ function databasics_token_info() {
   return $info;
 }
 
+/**
+ * Implements hook_tokens().
+ */
+function databasics_tokens($type, $tokens, array $data = array(), array $options = array()) {
+  $replacements = array();
 
+  if ($type == 'databasics-totals') {
+    foreach($tokens as $name => $original) {
+      switch($name) {
+        case 'count':
+          $count = db_query('SELECT SUM(view_count) FROM {databasics}')->fetchField();
+          $replacements[$original] = $count;
+          break;
+      }
+    }
+  }
 
+  if ($type == 'databasics-page' && !empty($data['databasics_record'])) {
+    $record = $data['databasics_record'];
+
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'view-count':
+          $replacements[$original] = $record->view_count;
+          break;
+
+        case 'last-viewed':
+          $replacements[$original] = $record->last_viewed;
+          break;
+      }
+    }
+  }
+
+  if ($type == 'node' && isset($tokens['view-count']) && !empty($data['node'])) {
+    $node = $data['node'];
+    global $user;
+    $count = db_query('SELECT SUM(view_count) FROM {databasics} WHERE nid = :nid', array(':nid' => $node->nid, ':uid' => $user->uid))->fetchField();
+    $replacements[$tokens['view-count']] = $count;
+
+    // [node:view-count:last-viewed]
+    if ($count_tokens = token_find_with_prefix($tokens, 'view-count')) {
+      $record = databasics_get_record($node->nid, $user->uid);
+      $replacements += token_generate('databasics-page', $count_tokens, array('databasics_record' => $record), $options);
+    }
+  }
+
+  return $replacements;
+}
 
 
 
