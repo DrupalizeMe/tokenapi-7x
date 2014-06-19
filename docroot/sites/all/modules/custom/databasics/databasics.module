@@ -70,6 +70,9 @@ function databasics_node_view($node, $view_mode = 'full') {
     databasics_set_record($record);
 
     $message = variable_get('databasics_message', 'You have viewed this page.');
+    $data = array();
+    $data['databasics_record'] = $record;
+    $message = token_replace($message, $data, array('clear' => TRUE));
 
     // Add the view count information to the node content.
     $node->content['node_views'] = array(
