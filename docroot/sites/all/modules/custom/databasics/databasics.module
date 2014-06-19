@@ -208,6 +208,7 @@ function databasics_token_info() {
         'name' => t('Last viewed'),
         'description' => t('Date the page was last viewed.'),
       ),
+    ),
   );
 
   // [node:view-count], [node:view-count:last-viewed]
